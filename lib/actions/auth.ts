@@ -9,7 +9,8 @@ export async function sendMagicLink(
 ): Promise<{ error?: string; success?: boolean }> {
   const normalizedEmail = email.toLowerCase().trim()
 
-  if (!normalizedEmail || !normalizedEmail.includes('@')) {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  if (!normalizedEmail || !emailRegex.test(normalizedEmail)) {
     return { error: 'Email inválido.' }
   }
 
