@@ -58,7 +58,7 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  const adminEmail = process.env.ADMIN_EMAIL
-  const dest = user?.email === adminEmail ? '/admin' : '/aulas'
+  const adminEmail = process.env.ADMIN_EMAIL?.toLowerCase()
+  const dest = user?.email?.toLowerCase() === adminEmail ? '/admin' : '/aulas'
   return NextResponse.redirect(new URL(dest, origin))
 }

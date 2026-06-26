@@ -1,5 +1,6 @@
 'use server'
 
+import { revalidatePath } from 'next/cache'
 import { createServiceClient } from '@/lib/supabase/service'
 import type { AcessoWithGestor, Gestor } from '@/types/db'
 
@@ -60,7 +61,8 @@ export async function addGestor(
   email: string
 ): Promise<{ error?: string }> {
   const normalizedEmail = email.toLowerCase().trim()
-  if (!normalizedEmail.includes('@')) return { error: 'Email inválido.' }
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  if (!normalizedEmail || !emailRegex.test(normalizedEmail)) return { error: 'Email inválido.' }
 
   const db = createServiceClient()
   const { error } = await db
@@ -69,6 +71,7 @@ export async function addGestor(
 
   if (error?.code === '23505') return { error: 'Email já cadastrado.' }
   if (error) return { error: 'Erro ao cadastrar gestor.' }
+  revalidatePath('/admin/gestores')
   return {}
 }
 
@@ -86,4 +89,5 @@ export async function removeGestor(id: string): Promise<void> {
   }
 
   await db.from('gestores').delete().eq('id', id)
+  revalidatePath('/admin/gestores')
 }

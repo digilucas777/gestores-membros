@@ -1,6 +1,7 @@
 // lib/actions/modulos.ts
 'use server'
 
+import { revalidatePath } from 'next/cache'
 import { createServiceClient } from '@/lib/supabase/service'
 import type { Modulo } from '@/types/db'
 
@@ -30,18 +31,25 @@ export async function createModulo(
     .from('modulos')
     .insert({ titulo: titulo.trim(), position: nextPosition })
   if (error) return { error: 'Erro ao criar módulo.' }
+  revalidatePath('/admin/modulos')
+  revalidatePath('/aulas')
   return {}
 }
 
 export async function updateModulo(id: string, titulo: string): Promise<void> {
   const db = createServiceClient()
   await db.from('modulos').update({ titulo: titulo.trim() }).eq('id', id)
+  revalidatePath('/admin/modulos')
+  revalidatePath('/aulas')
 }
 
 export async function deleteModulo(id: string): Promise<void> {
   const db = createServiceClient()
   // Aulas with this modulo_id will have modulo_id set to null (ON DELETE SET NULL)
   await db.from('modulos').delete().eq('id', id)
+  revalidatePath('/admin/modulos')
+  revalidatePath('/admin/aulas')
+  revalidatePath('/aulas')
 }
 
 export async function reorderModulos(ids: string[]): Promise<void> {
@@ -51,4 +59,6 @@ export async function reorderModulos(ids: string[]): Promise<void> {
       db.from('modulos').update({ position: index }).eq('id', id)
     )
   )
+  revalidatePath('/admin/modulos')
+  revalidatePath('/aulas')
 }

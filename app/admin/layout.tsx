@@ -1,6 +1,8 @@
 import AdminNav from '@/components/admin/AdminNav'
 import Link from 'next/link'
 
+export const dynamic = 'force-dynamic'
+
 export default function AdminLayout({
   children,
 }: {

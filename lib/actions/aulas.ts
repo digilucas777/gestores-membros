@@ -1,6 +1,7 @@
 // lib/actions/aulas.ts
 'use server'
 
+import { revalidatePath } from 'next/cache'
 import { createServiceClient } from '@/lib/supabase/service'
 import { extractVideoUrl } from '@/lib/utils'
 import type { Aula, Modulo } from '@/types/db'
@@ -70,6 +71,8 @@ export async function createAula(
   })
 
   if (error) return { error: 'Erro ao criar aula.' }
+  revalidatePath('/admin/aulas')
+  revalidatePath('/aulas')
   return {}
 }
 
@@ -97,12 +100,16 @@ export async function updateAula(
     .eq('id', id)
 
   if (error) return { error: 'Erro ao atualizar aula.' }
+  revalidatePath('/admin/aulas')
+  revalidatePath('/aulas')
   return {}
 }
 
 export async function deleteAula(id: string): Promise<void> {
   const db = createServiceClient()
   await db.from('aulas').delete().eq('id', id)
+  revalidatePath('/admin/aulas')
+  revalidatePath('/aulas')
 }
 
 export async function reorderAulas(ids: string[]): Promise<void> {
@@ -112,4 +119,6 @@ export async function reorderAulas(ids: string[]): Promise<void> {
       db.from('aulas').update({ position: index }).eq('id', id)
     )
   )
+  revalidatePath('/admin/aulas')
+  revalidatePath('/aulas')
 }

@@ -1,4 +1,6 @@
 // app/aulas/page.tsx
+export const dynamic = 'force-dynamic'
+
 import { getAulas, getModulos } from '@/lib/actions/aulas'
 import ModuloSection from '@/components/ModuloSection'
 import type { Aula, Modulo } from '@/types/db'
@@ -37,8 +39,7 @@ export default async function AulasPage() {
         <div>
           <h2 className="text-2xl font-bold">Aulas</h2>
           <p className="text-muted text-sm mt-1">
-            {aulas.length} aula{aulas.length !== 1 ? 's' : ''} disponíve
-            {aulas.length !== 1 ? 'is' : 'l'}
+            {aulas.length} aula{aulas.length !== 1 ? 's' : ''} disponível{aulas.length !== 1 ? 's' : ''}
           </p>
         </div>
 

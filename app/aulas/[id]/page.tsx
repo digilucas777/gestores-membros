@@ -1,4 +1,6 @@
 // app/aulas/[id]/page.tsx
+export const dynamic = 'force-dynamic'
+
 import { getAulaById } from '@/lib/actions/aulas'
 import VideoPlayer from '@/components/VideoPlayer'
 import Link from 'next/link'

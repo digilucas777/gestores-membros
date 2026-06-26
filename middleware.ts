@@ -31,13 +31,13 @@ export async function middleware(request: NextRequest) {
   } = await supabase.auth.getUser()
 
   const path = request.nextUrl.pathname
-  const adminEmail = process.env.ADMIN_EMAIL
+  const adminEmail = process.env.ADMIN_EMAIL?.toLowerCase()
 
   if (path.startsWith('/admin')) {
     if (!user) {
       return NextResponse.redirect(new URL('/login', request.url))
     }
-    if (user.email !== adminEmail) {
+    if (user.email?.toLowerCase() !== adminEmail) {
       return NextResponse.redirect(new URL('/aulas', request.url))
     }
     return supabaseResponse
@@ -51,7 +51,7 @@ export async function middleware(request: NextRequest) {
   }
 
   if (path === '/login' && user) {
-    const dest = user.email === adminEmail ? '/admin' : '/aulas'
+    const dest = user.email?.toLowerCase() === adminEmail ? '/admin' : '/aulas'
     return NextResponse.redirect(new URL(dest, request.url))
   }
 
