@@ -27,11 +27,11 @@ export default async function AulaPage({ params }: Props) {
         </h1>
       </header>
 
-      <main className="max-w-4xl mx-auto px-6 py-8">
-        <h2 className="text-2xl font-bold mb-6">{aula.titulo}</h2>
+      <main className="max-w-[800px] mx-auto px-6 py-10 flex flex-col gap-6">
+        <h2 className="text-2xl font-bold">{aula.titulo}</h2>
         <VideoPlayer url={aula.panda_video_url} title={aula.titulo} />
         {aula.descricao && (
-          <p className="text-muted text-sm mt-6 leading-relaxed">{aula.descricao}</p>
+          <p className="text-muted text-sm leading-relaxed">{aula.descricao}</p>
         )}
       </main>
     </div>

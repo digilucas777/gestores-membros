@@ -33,23 +33,30 @@ export default function VideoPlayer({ url, title }: Props) {
 
   if (isVideoflow) {
     return (
-      <div className="w-full aspect-video rounded-xl overflow-hidden bg-black">
+      <div
+        className="w-full rounded-xl overflow-hidden bg-black"
+        style={{ position: 'relative', aspectRatio: '16/9', maxHeight: '450px' }}
+      >
         <div
-          className="vf-player w-full h-full"
+          className="vf-player"
           data-vf-src={videoUrl}
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}
         />
       </div>
     )
   }
 
   return (
-    <div className="w-full aspect-video rounded-xl overflow-hidden bg-black">
+    <div
+      className="w-full rounded-xl overflow-hidden bg-black"
+      style={{ position: 'relative', aspectRatio: '16/9', maxHeight: '450px' }}
+    >
       <iframe
         src={videoUrl}
         title={title}
         allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture; fullscreen"
         allowFullScreen
-        className="w-full h-full border-0"
+        style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 'none' }}
       />
     </div>
   )
