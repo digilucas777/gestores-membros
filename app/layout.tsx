@@ -15,7 +15,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="pt-BR" className={geist.variable}>
+    <html lang="pt-BR" className={geist.variable} style={{ colorScheme: 'dark' }}>
       <body>{children}</body>
     </html>
   )
