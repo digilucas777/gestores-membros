@@ -66,3 +66,49 @@ export async function sendMagicLink(
 
   return { success: true }
 }
+
+export async function signInWithAdminPassword(
+  email: string,
+  password: string
+): Promise<{ error?: string; success?: boolean }> {
+  const normalizedEmail = email.toLowerCase().trim()
+
+  const adminEmail = process.env.ADMIN_EMAIL?.toLowerCase()
+  if (!adminEmail || normalizedEmail !== adminEmail) {
+    return { error: 'Acesso não autorizado.' }
+  }
+
+  const cookieStore = await cookies()
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return cookieStore.getAll()
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) =>
+            cookieStore.set(name, value, options)
+          )
+        },
+      },
+    }
+  )
+
+  const { error } = await supabase.auth.signInWithPassword({
+    email: normalizedEmail,
+    password,
+  })
+
+  if (error) {
+    console.error('[signInWithAdminPassword] Supabase error:', {
+      code: error.code,
+      message: error.message,
+      status: error.status,
+    })
+    return { error: 'Email ou senha incorretos.' }
+  }
+
+  return { success: true }
+}
