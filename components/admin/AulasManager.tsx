@@ -25,6 +25,7 @@ import {
   deleteAula,
   reorderAulas,
 } from '@/lib/actions/aulas'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import type { Aula, Modulo } from '@/types/db'
 
@@ -176,6 +177,14 @@ function SortableAulaCard({
           <p className="text-xs text-muted truncate mt-0.5">{aula.descricao}</p>
         )}
       </div>
+      <Link
+        href={`/aulas/${aula.id}`}
+        target="_blank"
+        className="text-accent hover:text-blue-400 text-xs transition-colors shrink-0"
+        title="Abrir aula"
+      >
+        ▶ Abrir
+      </Link>
       <button
         onClick={() => onEdit(aula)}
         className="text-muted hover:text-white text-xs transition-colors shrink-0"
