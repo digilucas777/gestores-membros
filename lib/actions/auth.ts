@@ -56,6 +56,11 @@ export async function sendMagicLink(
   })
 
   if (error) {
+    console.error('[sendMagicLink] Supabase error:', {
+      code: error.code,
+      message: error.message,
+      status: error.status,
+    })
     return { error: 'Erro ao enviar email. Tente novamente.' }
   }
 
