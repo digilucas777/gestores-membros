@@ -1,36 +1,58 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Trafego / BORDERLESS — Área de Membros
 
-## Getting Started
+Plataforma de aulas em vídeo para gestores com acesso via magic link.
 
-First, run the development server:
+## Stack
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- Next.js 15 (App Router)
+- Supabase (Auth + Postgres)
+- Tailwind CSS
+- TypeScript
+- Vercel
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Setup local
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. Clone o repositório
+2. Instale dependências: `npm install`
+3. Copie as variáveis de ambiente: `cp .env.local.example .env.local`
+4. Preencha `.env.local` com as credenciais do Supabase
+5. Execute o schema no Supabase SQL Editor: copie e cole `supabase/schema.sql`
+6. Rode o dev server: `npm run dev`
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Variáveis de ambiente
 
-## Learn More
+| Variável | Onde encontrar |
+|----------|----------------|
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase > Project Settings > API |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase > Project Settings > API |
+| `SUPABASE_SERVICE_ROLE_KEY` | Supabase > Project Settings > API |
+| `ADMIN_EMAIL` | Seu próprio email |
+| `NEXT_PUBLIC_APP_URL` | URL do Vercel após deploy |
 
-To learn more about Next.js, take a look at the following resources:
+## Deploy no Vercel
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. Crie o repositório no GitHub: `gestores-membros`
+2. Push: `git remote add origin https://github.com/SEU_USUARIO/gestores-membros.git && git push -u origin main`
+3. Acesse vercel.com > Add New Project > importe `gestores-membros`
+4. Configure as variáveis de ambiente (mesmas do `.env.local`, com `NEXT_PUBLIC_APP_URL` = URL do Vercel)
+5. Deploy
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Configurar Supabase para produção
 
-## Deploy on Vercel
+Após ter a URL do Vercel:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. Supabase > Authentication > URL Configuration
+2. **Site URL:** `https://seu-projeto.vercel.app`
+3. **Redirect URLs:** adicione `https://seu-projeto.vercel.app/auth/callback`
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Rotas
+
+| Rota | Acesso | Descrição |
+|------|--------|-----------|
+| `/login` | Público | Login via magic link |
+| `/aulas` | Gestores + Admin | Lista de aulas |
+| `/aulas/[id]` | Gestores + Admin | Player de vídeo |
+| `/admin` | Admin | Dashboard |
+| `/admin/gestores` | Admin | Gerenciar gestores |
+| `/admin/modulos` | Admin | Gerenciar módulos |
+| `/admin/aulas` | Admin | Gerenciar aulas |
