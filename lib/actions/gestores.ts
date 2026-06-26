@@ -74,5 +74,16 @@ export async function addGestor(
 
 export async function removeGestor(id: string): Promise<void> {
   const db = createServiceClient()
+  const adminEmail = process.env.ADMIN_EMAIL?.toLowerCase()
+
+  if (adminEmail) {
+    const { data } = await db
+      .from('gestores')
+      .select('email')
+      .eq('id', id)
+      .maybeSingle()
+    if (data?.email?.toLowerCase() === adminEmail) return
+  }
+
   await db.from('gestores').delete().eq('id', id)
 }

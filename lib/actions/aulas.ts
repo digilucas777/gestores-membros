@@ -2,7 +2,7 @@
 'use server'
 
 import { createServiceClient } from '@/lib/supabase/service'
-import { extractPandaVideoUrl } from '@/lib/utils'
+import { extractVideoUrl } from '@/lib/utils'
 import type { Aula, Modulo } from '@/types/db'
 
 export async function getModulos(): Promise<Modulo[]> {
@@ -44,16 +44,20 @@ export async function createAula(
   if (!titulo.trim()) return { error: 'Título obrigatório.' }
   if (!pandaInput.trim()) return { error: 'URL do vídeo obrigatória.' }
 
-  const panda_video_url = extractPandaVideoUrl(pandaInput)
+  const panda_video_url = extractVideoUrl(pandaInput)
   const db = createServiceClient()
 
-  const { data: last } = await db
+  let posQuery = db
     .from('aulas')
     .select('position')
-    .eq('modulo_id', moduloId ?? null)
     .order('position', { ascending: false })
     .limit(1)
-    .maybeSingle()
+
+  posQuery = moduloId
+    ? posQuery.eq('modulo_id', moduloId)
+    : posQuery.is('modulo_id', null)
+
+  const { data: last } = await posQuery.maybeSingle()
 
   const nextPosition = (last?.position ?? -1) + 1
 
@@ -79,7 +83,7 @@ export async function updateAula(
   if (!titulo.trim()) return { error: 'Título obrigatório.' }
   if (!pandaInput.trim()) return { error: 'URL do vídeo obrigatória.' }
 
-  const panda_video_url = extractPandaVideoUrl(pandaInput)
+  const panda_video_url = extractVideoUrl(pandaInput)
   const db = createServiceClient()
 
   const { error } = await db

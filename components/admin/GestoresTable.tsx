@@ -7,7 +7,13 @@ import { formatDate } from '@/lib/utils'
 import { useRouter } from 'next/navigation'
 import type { Gestor } from '@/types/db'
 
-export default function GestoresTable({ gestores }: { gestores: Gestor[] }) {
+export default function GestoresTable({
+  gestores,
+  adminEmail,
+}: {
+  gestores: Gestor[]
+  adminEmail: string
+}) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [showModal, setShowModal] = useState(false)
@@ -78,13 +84,17 @@ export default function GestoresTable({ gestores }: { gestores: Gestor[] }) {
                   <td className="py-3 pr-6 text-muted">{formatDate(g.last_seen_at)}</td>
                   <td className="py-3 pr-6 text-muted">{g.login_count}</td>
                   <td className="py-3">
-                    <button
-                      onClick={() => handleRemove(g.id, g.email)}
-                      disabled={isPending}
-                      className="text-red-400 hover:text-red-300 text-xs disabled:opacity-40 transition-colors"
-                    >
-                      Remover
-                    </button>
+                    {g.email.toLowerCase() !== adminEmail ? (
+                      <button
+                        onClick={() => handleRemove(g.id, g.email)}
+                        disabled={isPending}
+                        className="text-red-400 hover:text-red-300 text-xs disabled:opacity-40 transition-colors"
+                      >
+                        Remover
+                      </button>
+                    ) : (
+                      <span className="text-muted text-xs">master</span>
+                    )}
                   </td>
                 </tr>
               ))}

@@ -95,13 +95,13 @@ function AulaFormModal({
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm text-muted">Vídeo Panda Video *</label>
+            <label className="text-sm text-muted">Vídeo *</label>
             <textarea
               value={form.pandaInput}
               onChange={set('pandaInput')}
               rows={3}
               required
-              placeholder={`Cole aqui o código iframe ou a URL:\nhttps://player-vz-xxx.tv.pandavideo.com.br/embed/?v=...`}
+              placeholder={`Cole a URL ou o iframe completo:\nPanda Video: https://player-vz-xxx.tv.pandavideo.com.br/embed/?v=...\nVideoflow: <div class="vf-player" data-vf-src="..."></div>`}
               className="bg-background border border-border rounded-lg px-4 py-2.5 text-xs font-mono focus:outline-none focus:border-accent resize-none"
             />
           </div>
@@ -338,7 +338,7 @@ export default function AulasManager({ aulas: initialAulas, modulos }: Props) {
           initial={{
             titulo: editingAula.titulo,
             descricao: editingAula.descricao ?? '',
-            pandaInput: editingAula.panda_video_url,
+            pandaInput: editingAula.panda_video_url.replace(/^vf::/, ''),
             moduloId: editingAula.modulo_id ?? '',
           }}
           onSubmit={handleUpdate}

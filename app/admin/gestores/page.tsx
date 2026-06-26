@@ -4,6 +4,7 @@ import GestoresTable from '@/components/admin/GestoresTable'
 
 export default async function AdminGestoresPage() {
   const gestores = await getGestores()
+  const adminEmail = process.env.ADMIN_EMAIL?.toLowerCase() ?? ''
   return (
     <div className="flex flex-col gap-6">
       <div>
@@ -12,7 +13,7 @@ export default async function AdminGestoresPage() {
           Gerencie quem tem acesso à plataforma
         </p>
       </div>
-      <GestoresTable gestores={gestores} />
+      <GestoresTable gestores={gestores} adminEmail={adminEmail} />
     </div>
   )
 }
