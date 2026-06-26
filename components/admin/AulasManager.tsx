@@ -179,7 +179,6 @@ function SortableAulaCard({
       </div>
       <Link
         href={`/aulas/${aula.id}`}
-        target="_blank"
         className="text-accent hover:text-blue-400 text-xs transition-colors shrink-0"
         title="Abrir aula"
       >

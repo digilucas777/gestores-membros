@@ -14,7 +14,7 @@ export default function ModuloSection({ modulo, aulas }: Props) {
       <h2 className="text-xs font-semibold uppercase tracking-widest text-muted mb-3">
         {modulo?.titulo ?? 'Sem módulo'}
       </h2>
-      <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {aulas.map((aula) => (
           <AulaCard key={aula.id} aula={aula} />
         ))}
