@@ -1,7 +1,7 @@
 'use server'
 
 import { createServiceClient } from '@/lib/supabase/service'
-import type { AcessoWithGestor } from '@/types/db'
+import type { AcessoWithGestor, Gestor } from '@/types/db'
 
 export type AdminStats = {
   totalGestores: number
@@ -43,4 +43,36 @@ export async function getAdminStats(): Promise<AdminStats> {
     totalModulos: totalModulos ?? 0,
     recentAcessos: (recentAcessos ?? []) as AcessoWithGestor[],
   }
+}
+
+export async function getGestores(): Promise<Gestor[]> {
+  const db = createServiceClient()
+  const { data, error } = await db
+    .from('gestores')
+    .select('*')
+    .order('created_at', { ascending: false })
+  if (error) throw new Error(error.message)
+  return data ?? []
+}
+
+export async function addGestor(
+  nome: string,
+  email: string
+): Promise<{ error?: string }> {
+  const normalizedEmail = email.toLowerCase().trim()
+  if (!normalizedEmail.includes('@')) return { error: 'Email inválido.' }
+
+  const db = createServiceClient()
+  const { error } = await db
+    .from('gestores')
+    .insert({ nome: nome.trim() || null, email: normalizedEmail })
+
+  if (error?.code === '23505') return { error: 'Email já cadastrado.' }
+  if (error) return { error: 'Erro ao cadastrar gestor.' }
+  return {}
+}
+
+export async function removeGestor(id: string): Promise<void> {
+  const db = createServiceClient()
+  await db.from('gestores').delete().eq('id', id)
 }
