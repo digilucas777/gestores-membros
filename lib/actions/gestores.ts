@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { createServiceClient } from '@/lib/supabase/service'
+import { Resend } from 'resend'
 import type { AcessoWithGestor, Gestor } from '@/types/db'
 
 export type AdminStats = {
@@ -82,6 +83,46 @@ export async function addGestor(
       message: authError.message,
       status: authError.status,
     })
+  }
+
+  const { data: linkData, error: linkError } = await db.auth.admin.generateLink({
+    type: 'magiclink',
+    email: normalizedEmail,
+  })
+
+  if (linkError) {
+    console.error('[addGestor] generateLink error:', {
+      message: linkError.message,
+      status: linkError.status,
+    })
+  } else if (linkData?.properties?.action_link) {
+    const resendKey = process.env.RESEND_API_KEY
+    if (!resendKey) {
+      console.error('[addGestor] RESEND_API_KEY não configurada')
+    } else {
+      const resend = new Resend(resendKey)
+      const nomeDisplay = nome.trim() || normalizedEmail
+      const { error: emailError } = await resend.emails.send({
+        from: 'Trafego BORDERLESS <onboarding@resend.dev>',
+        to: normalizedEmail,
+        subject: 'Seu acesso à plataforma Trafego BORDERLESS',
+        html: `
+          <div style="font-family:sans-serif;max-width:560px;margin:0 auto;color:#111">
+            <h2 style="margin-bottom:8px">Bem-vindo(a), ${nomeDisplay}!</h2>
+            <p style="color:#555;margin-top:0">Você foi adicionado(a) como gestor na plataforma <strong>Trafego BORDERLESS</strong>.</p>
+            <p style="color:#555">Clique no botão abaixo para acessar sua conta. O link é de uso único e expira em 24 horas.</p>
+            <a href="${linkData.properties.action_link}"
+               style="display:inline-block;margin:24px 0;padding:14px 28px;background:#2563eb;color:#fff;text-decoration:none;border-radius:8px;font-weight:600;font-size:15px">
+              Acessar plataforma
+            </a>
+            <p style="color:#999;font-size:13px">Se você não esperava este email, pode ignorá-lo com segurança.</p>
+          </div>
+        `,
+      })
+      if (emailError) {
+        console.error('[addGestor] resend.emails.send error:', emailError)
+      }
+    }
   }
 
   revalidatePath('/admin', 'layout')
