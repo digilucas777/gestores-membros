@@ -8,8 +8,11 @@ import { createServiceClient } from '@/lib/supabase/service'
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
+  const token_hash = searchParams.get('token_hash')
+  const type = searchParams.get('type') as 'magiclink' | 'email' | null
 
-  if (!code) {
+  if (!code && !token_hash) {
+    console.error('[callback] Parâmetros ausentes:', Object.fromEntries(searchParams))
     return NextResponse.redirect(new URL('/login?error=missing_code', origin))
   }
 
@@ -31,9 +34,26 @@ export async function GET(request: NextRequest) {
     }
   )
 
-  const { error } = await supabase.auth.exchangeCodeForSession(code)
-  if (error) {
-    return NextResponse.redirect(new URL('/login?error=auth', origin))
+  if (code) {
+    const { error } = await supabase.auth.exchangeCodeForSession(code)
+    if (error) {
+      console.error('[callback] exchangeCodeForSession error:', {
+        code: error.code,
+        message: error.message,
+        status: error.status,
+      })
+      return NextResponse.redirect(new URL('/login?error=auth', origin))
+    }
+  } else if (token_hash && type) {
+    const { error } = await supabase.auth.verifyOtp({ token_hash, type })
+    if (error) {
+      console.error('[callback] verifyOtp error:', {
+        code: error.code,
+        message: error.message,
+        status: error.status,
+      })
+      return NextResponse.redirect(new URL('/login?error=auth', origin))
+    }
   }
 
   const {
@@ -43,10 +63,8 @@ export async function GET(request: NextRequest) {
   if (user?.email) {
     const service = createServiceClient()
 
-    // Atomically update last_seen_at and login_count
     await service.rpc('increment_login_count', { p_email: user.email })
 
-    // Insert access log (only for gestores, not admin)
     const { data: gestor } = await service
       .from('gestores')
       .select('id')
