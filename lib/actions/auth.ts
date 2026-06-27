@@ -1,7 +1,7 @@
 'use server'
 
 import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
+import { cookies, headers } from 'next/headers'
 import { createServiceClient } from '@/lib/supabase/service'
 
 export async function sendMagicLink(
@@ -58,10 +58,16 @@ export async function sendMagicLink(
     }
   )
 
+  const headerStore = await headers()
+  const host = headerStore.get('x-forwarded-host') ?? headerStore.get('host') ?? ''
+  const proto = headerStore.get('x-forwarded-proto') ?? 'https'
+  const callbackUrl = `${proto}://${host}/auth/callback`
+  console.log('[sendMagicLink] emailRedirectTo:', callbackUrl)
+
   const { error } = await supabase.auth.signInWithOtp({
     email: normalizedEmail,
     options: {
-      emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`,
+      emailRedirectTo: callbackUrl,
     },
   })
 
