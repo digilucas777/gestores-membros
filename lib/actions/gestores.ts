@@ -65,13 +65,26 @@ export async function addGestor(
   if (!normalizedEmail || !emailRegex.test(normalizedEmail)) return { error: 'Email inválido.' }
 
   const db = createServiceClient()
-  const { error } = await db
+  const { error: insertError } = await db
     .from('gestores')
     .insert({ nome: nome.trim() || null, email: normalizedEmail })
 
-  if (error?.code === '23505') return { error: 'Email já cadastrado.' }
-  if (error) return { error: 'Erro ao cadastrar gestor.' }
-  revalidatePath('/admin/gestores')
+  if (insertError?.code === '23505') return { error: 'Email já cadastrado.' }
+  if (insertError) return { error: 'Erro ao cadastrar gestor.' }
+
+  const { error: authError } = await db.auth.admin.createUser({
+    email: normalizedEmail,
+    email_confirm: true,
+  })
+
+  if (authError && authError.status !== 422) {
+    console.error('[addGestor] auth.admin.createUser error:', {
+      message: authError.message,
+      status: authError.status,
+    })
+  }
+
+  revalidatePath('/admin', 'layout')
   return {}
 }
 
@@ -89,5 +102,5 @@ export async function removeGestor(id: string): Promise<void> {
   }
 
   await db.from('gestores').delete().eq('id', id)
-  revalidatePath('/admin/gestores')
+  revalidatePath('/admin', 'layout')
 }
