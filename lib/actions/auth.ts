@@ -19,11 +19,21 @@ export async function sendMagicLink(
 
   if (!isAdmin) {
     const service = createServiceClient()
-    const { data } = await service
+    const { data, error: queryError } = await service
       .from('gestores')
       .select('id')
       .eq('email', normalizedEmail)
       .maybeSingle()
+
+    if (queryError) {
+      console.error('[sendMagicLink] Erro na query gestores:', {
+        code: queryError.code,
+        message: queryError.message,
+        details: queryError.details,
+        hint: queryError.hint,
+      })
+      return { error: 'Erro ao verificar acesso. Tente novamente.' }
+    }
 
     if (!data) {
       return { error: 'Acesso não autorizado.' }
